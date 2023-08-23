@@ -1,0 +1,5 @@
+>>> Warning 227 "RetroBot.c" Line 449(1,1): Feature not supported    XINST
+>>> Warning 202 "RetroBot.c" Line 105(7,18): Variable never used:   Temperature
+>>> Warning 202 "RetroBot.c" Line 107(7,16): Variable never used:   PIRStatus
+      Memory usage:   ROM=4%      RAM=1% - 1%
+      0 Errors,  3 Warnings.

@@ -1,0 +1,62 @@
+
+ROM used: 2386 (4%)
+          2386 (4%) including unused fragments
+
+          2 Average locations per line
+          9 Average locations per statement
+
+RAM used: 34 (1%) at main() level
+          49 (1%) worst case
+
+Stack used: 6 worst case (out of 30 total available)
+
+Lines Stmts  %   Files
+----- ----- ---  -----
+  448   175  66  RetroBot.c
+   32     0   0  RetroBot.h
+  378     0   0  ..\..\..\..\..\..\..\..\..\Archivos de programa\PICC\devices\18F2620.h
+   44    11   4  LM75.h
+  213    45  17  MCP23016.h
+   67    35  13  SRF02.h
+----- -----
+ 1182   266 Total
+
+Page ROM  %  RAM   Vol Diff  Functions:
+---- --- --- ---   --- ----  ----------
+0     38   1   1             @delay_ms1
+0    102   2   3             @I2C_READ_1
+0    108   2   1             @I2C_WRITE_1
+0     96   2   2   119  1.7  MCP23016_Reg_Write
+0    112   2   7   287  3.4  MCP23016_Reg_Write16
+0    218   5   5   431  3.9  PCF8574_Reg_Read16
+0     34   1   6    53  1.9  MCP23016_output_high
+0     44   1   6    64  2.4  MCP23016_output_low
+0    264   6   5   574  2.8  SRF02_Distance_8
+0     42   1   1    93  3.3  Timer3_isr
+0     38   1   3    99  3.3  InitGeneralPurposeCounters
+0     38   1   2   167  3.3  Blink
+0    530  11   2  2752  6.9  SetMotor
+0    252   5   1   811  3.9  Dancer
+0    316   7   1  1397  6.9  MAIN
+
+Program metrics:
+    Functions               12
+    Statements              266
+    Comments                730
+    Volume (V)              9980
+    Difficilty (D)          44.4
+    Effort to implement (E) 443484
+    Time to implement (T)   6 hours, 51 minutes
+    Est Delivered Bugs (B)  2
+    Cyclomatic Complexity   41
+    Maintainability (MI)    62
+
+ Segment     Used  Free
+-----------  ----  ----
+00000-00002     4  0  
+00004-00006     0  4  
+00008-0009C   150  0  
+0009E-0FFFE  2232  63146  
+
+
+

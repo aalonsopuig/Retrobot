@@ -1,0 +1,136 @@
+000     @SCRATCH
+001     @SCRATCH
+001     _RETURN_
+002     @SCRATCH
+003     @SCRATCH
+004     @SCRATCH
+005     @INTERRUPT_AREA
+006     @INTERRUPT_AREA
+007     @INTERRUPT_AREA
+008     @INTERRUPT_AREA
+009     @INTERRUPT_AREA
+00A     @INTERRUPT_AREA
+00B     @INTERRUPT_AREA
+00C     @INTERRUPT_AREA
+00D     @INTERRUPT_AREA
+00E     @INTERRUPT_AREA
+00F     @INTERRUPT_AREA
+010     @INTERRUPT_AREA
+011     @INTERRUPT_AREA
+012     @INTERRUPT_AREA
+013     @INTERRUPT_AREA
+014     @INTERRUPT_AREA
+015     @INTERRUPT_AREA
+016     @INTERRUPT_AREA
+017     @INTERRUPT_AREA
+018     Temperature
+019     Distance
+01A.0   PIRStatus
+01A.1   AutoNavMode
+01B-01E Counter
+01F-020 i
+021     MCP23016_Reg_Write.Reg
+021     SetMotor.MotorNum
+021     Blink.blinks
+021     SRF02_Distance_8.DeviceAddress
+021     InitGeneralPurposeCounters.NumCounter
+021     Dancer.@SCRATCH1
+021     MAIN.@SCRATCH1
+022     SRF02_Distance_8.DataHigh
+022     SetMotor.Direction
+022     MCP23016_Reg_Write.Data
+022     Blink.i
+022     InitGeneralPurposeCounters.@SCRATCH1
+023     SRF02_Distance_8.DataLow
+023-024 MCP23016_output_high.Pin
+023-024 MCP23016_output_low.Pin
+023     InitGeneralPurposeCounters.@SCRATCH2
+024     SRF02_Distance_8.Distance
+025     PCF8574_Reg_Read16.Reg
+025     @delay_ms1.P1
+025     MCP23016_output_high.@SCRATCH1
+025     MCP23016_output_low.@SCRATCH1
+025     SRF02_Distance_8.@SCRATCH1
+026     PCF8574_Reg_Read16.Data1
+026     MCP23016_output_high.@SCRATCH2
+026     MCP23016_output_low.@SCRATCH2
+027     PCF8574_Reg_Read16.Data2
+027     MCP23016_output_high.@SCRATCH3
+027     MCP23016_output_low.@SCRATCH3
+028-029 PCF8574_Reg_Read16.Data
+028     MCP23016_output_high.@SCRATCH4
+028     MCP23016_output_low.@SCRATCH4
+029     MCP23016_Reg_Write16.Reg
+02A     @I2C_READ_1.P1
+02A-02B MCP23016_Reg_Write16.Data
+02B     @I2C_READ_1.@SCRATCH1
+02C     MCP23016_Reg_Write16.Data1
+02C     @I2C_READ_1.@SCRATCH2
+02D     MCP23016_Reg_Write16.Data2
+02E     @I2C_WRITE_1.P1
+02E     MCP23016_Reg_Write16.@SCRATCH1
+02F     MCP23016_Reg_Write16.@SCRATCH2
+030     Timer3_isr.NumCounter
+FB4.6   C1OUT
+FB4.7   C2OUT
+FBB-FBC CCP_2
+FBB     CCP_2_LOW
+FBC     CCP_2_HIGH
+FBE-FBF CCP_1
+FBE     CCP_1_LOW
+FBF     CCP_1_HIGH
+FE9-FEA @WRITE_PROGRAM_MEMORY.P1
+FE9-FEA @READ_PROGRAM_MEMORY.P2
+FF6-FF8 @WRITE_PROGRAM_MEMORY.P1
+FF6-FF8 @READ_PROGRAM_MEMORY.P2
+
+ROM Allocation:
+00EE  @delay_ms1
+0206  @I2C_READ_1
+013A  @I2C_WRITE_1
+01A6  MCP23016_Reg_Write
+044E  MCP23016_Reg_Write16
+0374  PCF8574_Reg_Read16
+04BE  MCP23016_output_high
+04E0  MCP23016_output_low
+026C  SRF02_Distance_8
+009E  Timer3_isr
+00C8  InitGeneralPurposeCounters
+0114  Blink
+050C  SetMotor
+071E  Dancer
+081A  MAIN
+081A  @cinit
+
+Project Directory:
+    C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\
+
+Project Files:
+    RetroBot.c
+    RetroBot.h
+    ..\..\..\..\..\..\..\..\..\Archivos de programa\PICC\devices\18F2620.h
+    LM75.h
+    MCP23016.h
+    SRF02.h
+
+Units:
+    RetroBot.c (main)
+
+Compiler Settings:
+    Processor:      PIC18F2620
+    Pointer Size:   16
+    ADC Range:      0-255
+    Opt Level:      9
+    Short,Int,Long: UNSIGNED: 1,8,16
+    Float,Double:   32,32
+
+Output Files:
+    Errors:      RetroBot.err
+    Ext Symbols: RetroBot.esym
+    INHX32:      RetroBot.hex
+    Symbols:     RetroBot.sym
+    List:        RetroBot.lst
+    Debug/COFF:  RetroBot.cof
+    Project:     RetroBot.PJT
+    Call Tree:   RetroBot.tre
+    Statistics:  RetroBot.sta

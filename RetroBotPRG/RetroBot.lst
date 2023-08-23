@@ -1,0 +1,1963 @@
+CCS PCH C Compiler, Version 4.057, 24403               17-jul-11 02:07
+
+               Filename: RetroBot.lst
+
+               ROM used: 2386 bytes (4%)
+                         Largest free fragment is 63146
+               RAM used: 34 (1%) at main() level
+                         49 (1%) worst case
+               Stack:    6 worst case (5 in main + 1 for interrupts)
+
+*
+00000:  GOTO   081A
+*
+00008:  MOVWF  05
+0000A:  MOVFF  FD8,06
+0000E:  MOVFF  FE0,07
+00012:  MOVLB  0
+00014:  MOVFF  FE9,0D
+00018:  MOVFF  FEA,08
+0001C:  MOVFF  FE1,09
+00020:  MOVFF  FE2,0A
+00024:  MOVFF  FD9,0B
+00028:  MOVFF  FDA,0C
+0002C:  MOVFF  FF3,14
+00030:  MOVFF  FF4,15
+00034:  MOVFF  FFA,16
+00038:  MOVFF  00,0F
+0003C:  MOVFF  01,10
+00040:  MOVFF  02,11
+00044:  MOVFF  03,12
+00048:  MOVFF  04,13
+0004C:  BTFSS  FA0.1
+0004E:  GOTO   0058
+00052:  BTFSC  FA1.1
+00054:  GOTO   009E
+00058:  MOVFF  0F,00
+0005C:  MOVFF  10,01
+00060:  MOVFF  11,02
+00064:  MOVFF  12,03
+00068:  MOVFF  13,04
+0006C:  BSF    0E.7
+0006E:  MOVFF  0D,FE9
+00072:  MOVFF  08,FEA
+00076:  MOVFF  09,FE1
+0007A:  MOVFF  0A,FE2
+0007E:  MOVFF  0B,FD9
+00082:  MOVFF  0C,FDA
+00086:  MOVFF  14,FF3
+0008A:  MOVFF  15,FF4
+0008E:  MOVFF  16,FFA
+00092:  MOVF   05,W
+00094:  MOVFF  07,FE0
+00098:  MOVFF  06,FD8
+0009C:  RETFIE 0
+.................... /* 
+.................... PROGRAM:    RetroBot 
+.................... DEVELOPER:  LIEBANA Design 
+.................... DATE:       July 2011 
+.................... Purpose:    This program is loaded in the ZX81 Expansion Card 
+....................             and control the interface. 
+....................  
+.................... Pinout: 
+.................... RA0   IN    Not connected 
+.................... RA1   OUT   ZX81 Wait signal 
+.................... RA2   IN    ZX81 Direction of data  
+.................... RA3   OUT   Relay control 
+.................... RA4   IN    Not connected 
+.................... RA5   IN    PIR signal 
+.................... RB0   IN    ZX81 ready signal       
+.................... RB1   I/O   Data Line 1  
+.................... RB2   I/O   Data Line 2 
+.................... RB3   I/O   Data Line 3 
+.................... RB4   I/O   Data Line 4 
+.................... RB5   I/O   Data Line 5 
+.................... RB6   I/O   Data Line 6 
+.................... RB7   I/O   Data Line 7 
+.................... RC0   IN    Not connected    
+.................... RC1   OUT   PWM2 for motors    
+.................... RC2   OUT   PWM1 for motors  
+.................... RC3         I2C. SCL 
+.................... RC4         I2C. SDA 
+.................... RC5   I/O   Data Line 0 
+.................... RC6   OUT   Led 
+.................... RC7   IN    Not connected 
+....................  
+.................... I/O Expansion Port Pinout: 
+....................  
+.................... A0    OUT   S1M1 
+.................... A1    OUT   S2M1 
+.................... A2    OUT   S1M2 
+.................... A3    OUT   S2M2 
+.................... A4    OUT   S1M3 
+.................... A5    OUT   S2M3 
+.................... A6    OUT   S1M4 
+.................... A7    OUT   S2M4  
+.................... B0    OUT   S1M5 
+.................... B1    OUT   S2M5 
+.................... B2    OUT   S1M6 
+.................... B3    OUT   S2M6 
+.................... B4    OUT   S1M7 
+.................... B5    OUT   S2M7 
+.................... B6    OUT   S1M8 
+.................... B7    OUT   S2M8 
+....................  
+....................  
+.................... */ 
+.................... // LIBRARIES 
+.................... #include "RetroBot.h" 
+.................... #include <18F2620.h> 
+.................... //////// Standard Header file for the PIC18F2620 device //////////////// 
+.................... #device PIC18F2620 
+.................... #list 
+....................  
+.................... #device adc=8 
+....................  
+.................... #FUSES NOWDT                    //No Watch Dog Timer 
+.................... #FUSES WDT128                   //Watch Dog Timer uses 1:128 Postscale 
+.................... #FUSES HS                       //High speed Osc (> 4mhz) 
+.................... #FUSES NOPROTECT                //Code not protected from reading 
+.................... #FUSES IESO                     //Internal External Switch Over mode enabled 
+.................... #FUSES BROWNOUT                 //Reset when brownout detected 
+.................... #FUSES BORV21                   //Brownout reset at 2.1V 
+.................... #FUSES PUT                      //Power Up Timer 
+.................... #FUSES NOCPD                    //No EE protection 
+.................... #FUSES STVREN                   //Stack full/underflow will cause reset 
+.................... #FUSES NODEBUG                  //No Debug mode for ICD 
+.................... #FUSES NOLVP                    //No Low Voltage Programming on B3(PIC16) or B5(PIC18) 
+.................... #FUSES NOWRT                    //Program memory not write protected 
+.................... #FUSES NOWRTD                   //Data EEPROM not write protected 
+.................... #FUSES NOEBTR                   //Memory not protected from table reads 
+.................... #FUSES NOCPB                    //No Boot Block code protection 
+.................... #FUSES NOEBTRB                  //Boot block not protected from table reads 
+.................... #FUSES NOWRTC                   //configuration not registers write protected 
+.................... #FUSES NOWRTB                   //Boot block not write protected 
+.................... #FUSES FCMEN                    //Fail-safe clock monitor enabled 
+.................... #FUSES XINST                    //Extended set extension and Indexed Addressing mode enabled 
+.................... //#FUSES PBADEN                   //PORTB pins are configured as analog input channels on RESET 
+.................... #FUSES LPT1OSC                  //Timer1 configured for low-power operation 
+.................... #FUSES MCLR                     //Master Clear pin enabled 
+....................  
+.................... #use delay(clock=20000000) 
+*
+000EE:  CLRF   FEA
+000F0:  MOVLW  25
+000F2:  MOVWF  FE9
+000F4:  MOVF   FEF,W
+000F6:  BZ    0112
+000F8:  MOVLW  06
+000FA:  MOVWF  01
+000FC:  CLRF   00
+000FE:  DECFSZ 00,F
+00100:  BRA    00FE
+00102:  DECFSZ 01,F
+00104:  BRA    00FC
+00106:  MOVLW  7B
+00108:  MOVWF  00
+0010A:  DECFSZ 00,F
+0010C:  BRA    010A
+0010E:  DECFSZ FEF,F
+00110:  BRA    00F8
+00112:  RETLW  00
+.................... #use i2c(Master,Slow,sda=PIN_C4,scl=PIN_C3) 
+*
+0013A:  MOVLW  08
+0013C:  MOVWF  01
+0013E:  MOVLW  05
+00140:  MOVWF  00
+00142:  DECFSZ 00,F
+00144:  BRA    0142
+00146:  BCF    F8B.3
+00148:  BCF    F94.3
+0014A:  MOVLW  06
+0014C:  MOVWF  00
+0014E:  DECFSZ 00,F
+00150:  BRA    014E
+00152:  RLCF   2E,F
+00154:  BCF    F8B.4
+00156:  BTFSC  FD8.0
+00158:  BSF    F94.4
+0015A:  BTFSS  FD8.0
+0015C:  BCF    F94.4
+0015E:  BSF    F94.3
+00160:  BTFSS  F82.3
+00162:  BRA    0160
+00164:  DECFSZ 01,F
+00166:  BRA    013E
+00168:  MOVLW  05
+0016A:  MOVWF  00
+0016C:  DECFSZ 00,F
+0016E:  BRA    016C
+00170:  BCF    F8B.3
+00172:  BCF    F94.3
+00174:  NOP   
+00176:  BSF    F94.4
+00178:  MOVLW  06
+0017A:  MOVWF  00
+0017C:  DECFSZ 00,F
+0017E:  BRA    017C
+00180:  MOVLW  06
+00182:  MOVWF  00
+00184:  DECFSZ 00,F
+00186:  BRA    0184
+00188:  BSF    F94.3
+0018A:  BTFSS  F82.3
+0018C:  BRA    018A
+0018E:  CLRF   01
+00190:  MOVLW  06
+00192:  MOVWF  00
+00194:  DECFSZ 00,F
+00196:  BRA    0194
+00198:  BTFSC  F82.4
+0019A:  BSF    01.0
+0019C:  BCF    F8B.3
+0019E:  BCF    F94.3
+001A0:  BCF    F8B.4
+001A2:  BCF    F94.4
+001A4:  RETLW  00
+*
+00206:  MOVLW  08
+00208:  MOVWF  2B
+0020A:  MOVFF  00,2C
+0020E:  BSF    F94.4
+00210:  MOVLW  06
+00212:  MOVWF  00
+00214:  DECFSZ 00,F
+00216:  BRA    0214
+00218:  BSF    F94.3
+0021A:  BTFSS  F82.3
+0021C:  BRA    021A
+0021E:  BTFSC  F82.4
+00220:  BSF    FD8.0
+00222:  BTFSS  F82.4
+00224:  BCF    FD8.0
+00226:  RLCF   01,F
+00228:  MOVLW  05
+0022A:  MOVWF  00
+0022C:  DECFSZ 00,F
+0022E:  BRA    022C
+00230:  BCF    F94.3
+00232:  BCF    F8B.3
+00234:  DECFSZ 2B,F
+00236:  BRA    020E
+00238:  BSF    F94.4
+0023A:  MOVLW  06
+0023C:  MOVWF  00
+0023E:  DECFSZ 00,F
+00240:  BRA    023E
+00242:  BCF    F8B.4
+00244:  MOVF   2C,W
+00246:  BTFSS  FD8.2
+00248:  BCF    F94.4
+0024A:  NOP   
+0024C:  BSF    F94.3
+0024E:  BTFSS  F82.3
+00250:  BRA    024E
+00252:  MOVLW  05
+00254:  MOVWF  00
+00256:  DECFSZ 00,F
+00258:  BRA    0256
+0025A:  BCF    F8B.3
+0025C:  BCF    F94.3
+0025E:  MOVLW  06
+00260:  MOVWF  00
+00262:  DECFSZ 00,F
+00264:  BRA    0262
+00266:  BCF    F8B.4
+00268:  BCF    F94.4
+0026A:  RETLW  00
+....................  
+....................  
+.................... #include "LM75.h"             //Library for LM75 I2C Temperature Sensor  
+.................... /* 
+.................... Library:       LM75.h 
+.................... Purpose:       Manage one or more LM75 I2C Temperature Sensor 
+.................... Developer:     Quark Robotics 
+.................... Date:          February 2011 
+....................  
+.................... FUNCTIONS: 
+....................  
+.................... -LM75_TempRead(byte LM75Address) returns the temperature value of the selected 
+.................... LM75 chip in ºC in a signed integer8 value 
+....................  
+.................... CONFIGURATION: 
+....................  
+.................... LM75 have four pins for configuring the address. They are A0, A1 and A2.  
+.................... connecting any one of them to Vcc means it will value 1, and connecting it to 
+.................... GND means it will value 2. As a result, the address of an LM75 chip is 
+.................... 1001-A2A1A0-0. For example, if A0=A1=A2=0 then the address is 10010000 and if  
+.................... A0=A1=A2=1, then address is 10011110. 
+.................... */ 
+....................  
+....................  
+.................... signed int LM75_TempRead(byte LM75Address)       // 
+.................... //Read the temperature: 
+.................... //DataHigh contains the signed ºC figure 
+.................... //MSB of DataLow contains the decimal value as LM75 have 0.5ºC sensibility 
+.................... //we ignore this sensibility in this function, so the function returns 
+.................... //the ºC value either positive or negative as per LM75 caracteristics. 
+.................... { 
+....................    byte DataHigh=0, DataLow=0;         //Bytes read 
+....................     
+....................    i2c_start(); 
+....................    i2c_write(LM75Address); 
+....................    i2c_write(0x00);                    // Pointer Byte 
+....................    i2c_start(); 
+....................    i2c_write(LM75Address|1); 
+....................    DataHigh = i2c_read();              // with ACK 
+....................    DataLow = i2c_read(0);              // with NAK 
+....................    i2c_stop(); 
+....................    if (DataHigh>150) DataHigh=0; //Error in data. Better return 0. 
+....................    return (DataHigh); 
+.................... } 
+....................  
+....................  
+....................  
+.................... #include "MCP23016.h"         //MCP23016 Chip (16 bit IO expander via I2C) 
+.................... /* 
+.................... Library:       MCP23016.h 
+.................... Purpose:       Use of MCP23016 Chip (16 bit IO expander via I2C) 
+.................... Developer:     Quark Robotics 
+.................... Date:          June 2010 
+.................... Compiler:      CCS PCH v4.057 
+....................  
+.................... This library manage the MCP23016 Chip (16 bit IO expander via I2C). This device 
+.................... have two eight-bit ports (PortA and PortB). The way to works with this ports is 
+.................... by writing and reading registers. There are 6 couples of registers (see section 
+.................... of #DEFINES). Each element of the couple is refered to each of the ports. 
+.................... The registers could be accesed (for read or write) either individualy or in 
+.................... couples. 
+....................  
+.................... Read below the information about Functions, Configuration and Warnings. 
+....................  
+.................... FUNCTIONS: 
+.................... MCP23016_Reg_Write(byte Reg, Data): Write a byte to a register 
+.................... MCP23016_Reg_Write16(byte Reg, unsigned int16 Data): Write data to registers in  
+.................... 16 bit mode (a couple of registers at a time).  
+.................... PCF8574_Reg_Read(byte Reg): Read data from the register 
+.................... PCF8574_Reg_Read16(byte Reg): Read data from a couple of registers 
+.................... MCP23016_output_high (int16 Pin): Set a pin or set of pins at PortA and PortB 
+.................... MCP23016_output_low (int16 Pin): clear a pin or set of pins at PortA and PortB 
+.................... MCP23016_input(int16 Pin): Get the value of a pin at PortA and PortB. If more  
+.................... than one pin is requested, the function return true if any of the pins is active 
+....................  
+.................... Examples: 
+....................  
+....................    //write 0b00001111 (0F) at IODIR0 register 
+....................    MCP23016_Reg_Write(IODIR0, 0b00001111); 
+....................     
+....................    //write FF at IODIR1 and 0F at IODIR0 register 
+....................    MCP23016_Reg_Write16(IODIR0, 0xFF0F); 
+....................     
+....................    //read the values at PortA (GP0 register) 
+....................    data=PCF8574_Reg_Read(GP0); 
+....................     
+....................    //read the values at PortA (GP0) and PortB (GP1) 
+....................    data16=PCF8574_Reg_Read16(GP0); 
+....................     
+....................    //set the Pin 3 at PortA not changing the rest of the bits 
+....................    MCP23016_output_high (MCP23016_PIN_A3) 
+....................  
+....................    //clear the bits 3 and 5 at PortB not changing the rest of the bits 
+....................    MCP23016_output_low (MCP23016_PIN_B3|MCP23016_PIN_B5) 
+....................  
+....................    //Read bit 3 of PortA 
+....................    data=MCP23016_input(MCP23016_PIN_A3) 
+....................  
+.................... CONFIGURATION: 
+.................... (1) Include the I2C preprocessor command at your main program. Something like: 
+.................... #use i2c(Master,Slow,sda=PIN_C4,scl=PIN_C3) 
+.................... (2) Ensure you use the correct I2C address.  
+.................... MCP23016 address: |0|1|0|0|A2|A1|A0|R/W| 
+.................... A2,A1 and A0 are the external pins for getting different addreses. 
+.................... R/W is the read, write bit. 
+.................... In this library we have considered the use of the MCP23016 with A2, A1, A0  
+.................... connected to Vss (0 volts). If this is not the case, change the address at 
+.................... #DEFINE MCP23016Address 
+.................... (3) Configure direction (input or output) of each port bit by writing to the 
+.................... registers IODIR0 and IODIR1. A port coud have some bits as inputs (1) and others 
+.................... as outputs (0). ie: MCP23016_Reg_Write(IODIR0, 0b00001111) the first 4 pins 
+.................... of the register will be used as inputs and the last 4 as outputs 
+.................... (4) Write/read from/to the ports. ie: MCP23016_Reg_Write(GP0, 0xFF); write FF 
+.................... to PortA while data=PCF8574_Reg_Read(GP0); reads the values at PortA 
+....................  
+....................  
+.................... WARNINGS: 
+.................... (1) This device starts with all pins configured as input 
+.................... (2) If a port is configured in part as input and in part as output (some pins 
+.................... as input and other as output), then if you write a byte, only the output pins 
+.................... will show the corresponding bits of that value, but if you perform a read of 
+.................... that port, you will get both the inputs and outputs. ie: if you have PortA 
+.................... configured with the first 4 bits as inputs and the 4 last bits as outputs, if 
+.................... you write FF (11111111) to the port, only the output bits will show data, so 
+.................... at PortA you will have 1111xxxx, being xxxx whatever values of inputs are there. 
+.................... If you now have at the input bits for example the value 0001 (first 4 pins) and 
+.................... you perform a read of this port, you will get 11110001 so, the first 4 bits are 
+.................... the input bits and the last 4 bits are the values you wrote to them. If you 
+.................... whant to eliminate them, you just need to use a mask. for example 
+.................... data=PCF8574_Reg_Read(GP0) & 0b00001111 will just give you the values of the 
+.................... four first bits and data=PCF8574_Reg_Read(GP0) & PCF8574_Reg_Read(IODIR0) will 
+.................... give you just the data at input pins (the mask here is the configuration 
+.................... register of such port) 
+....................  
+.................... --- 
+.................... */ 
+....................  
+.................... #DEFINE MCP23016Address  0b01000000  //The I2C address of the device if A0,A1,A2  
+....................                                      //are connected to Vss (0v) 
+....................                                       
+.................... //Registers described in datasheet                                      
+.................... #DEFINE  GP0     0x00               //PortA 
+.................... #DEFINE  GP1     0x01               //PortB 
+.................... #DEFINE  OLAT0   0x02               //Output latch of PortA 
+.................... #DEFINE  OLAT1   0x03               //Output latch of PortB 
+.................... #DEFINE  IPOL0   0x04               //Polarity of PortA pins 
+.................... #DEFINE  IPOL1   0x05               //Polarity of PortB pins 
+.................... #DEFINE  IODIR0  0x06               //Direction of PortA pins (1=In, 0=Out) 
+.................... #DEFINE  IODIR1  0x07               //Direction of PortB pins (1=In, 0=Out) 
+.................... #DEFINE  INTCAP0 0x08               //Interrupt Capture of PortA 
+.................... #DEFINE  INTCAP1 0x09               //Interrupt Capture of PortB 
+.................... #DEFINE  IOCON0  0x0A               //I/O expander control register 
+.................... #DEFINE  IOCON1  0x0B               //Same as IOCON0 
+....................  
+.................... //Bits of registers 
+.................... #DEFINE  MCP23016_PIN_A0 0x0001      
+.................... #DEFINE  MCP23016_PIN_A1 0x0002      
+.................... #DEFINE  MCP23016_PIN_A2 0x0004      
+.................... #DEFINE  MCP23016_PIN_A3 0x0008      
+.................... #DEFINE  MCP23016_PIN_A4 0x0010      
+.................... #DEFINE  MCP23016_PIN_A5 0x0020      
+.................... #DEFINE  MCP23016_PIN_A6 0x0040      
+.................... #DEFINE  MCP23016_PIN_A7 0x0080      
+.................... #DEFINE  MCP23016_PIN_B0 0x0100      
+.................... #DEFINE  MCP23016_PIN_B1 0x0200      
+.................... #DEFINE  MCP23016_PIN_B2 0x0400      
+.................... #DEFINE  MCP23016_PIN_B3 0x0800      
+.................... #DEFINE  MCP23016_PIN_B4 0x1000      
+.................... #DEFINE  MCP23016_PIN_B5 0x2000      
+.................... #DEFINE  MCP23016_PIN_B6 0x4000      
+.................... #DEFINE  MCP23016_PIN_B7 0x8000      
+....................  
+.................... void MCP23016_Reg_Write(byte Reg, Data) 
+.................... //Write data to a register in 8 bit mode 
+.................... { 
+....................    i2c_start();                  //Starting Signal 
+*
+001A6:  BSF    F94.4
+001A8:  MOVLW  05
+001AA:  MOVWF  00
+001AC:  DECFSZ 00,F
+001AE:  BRA    01AC
+001B0:  BSF    F94.3
+001B2:  MOVLW  06
+001B4:  MOVWF  00
+001B6:  DECFSZ 00,F
+001B8:  BRA    01B6
+001BA:  BCF    F8B.4
+001BC:  BCF    F94.4
+001BE:  MOVLW  05
+001C0:  MOVWF  00
+001C2:  DECFSZ 00,F
+001C4:  BRA    01C2
+001C6:  BCF    F8B.3
+001C8:  BCF    F94.3
+....................    i2c_write(MCP23016Address);   //I2C Address (Write) 
+001CA:  MOVLW  40
+001CC:  MOVWF  2E
+001CE:  RCALL  013A
+....................    i2c_write(Reg);               //Select register 
+001D0:  MOVFF  21,2E
+001D4:  RCALL  013A
+....................    i2c_write(Data);              //Write data 
+001D6:  MOVFF  22,2E
+001DA:  RCALL  013A
+....................    i2c_stop(); 
+001DC:  BCF    F94.4
+001DE:  NOP   
+001E0:  BSF    F94.3
+001E2:  BTFSS  F82.3
+001E4:  BRA    01E2
+001E6:  MOVLW  05
+001E8:  MOVWF  00
+001EA:  DECFSZ 00,F
+001EC:  BRA    01EA
+001EE:  BRA    01F0
+001F0:  NOP   
+001F2:  BSF    F94.4
+001F4:  MOVLW  05
+001F6:  MOVWF  00
+001F8:  DECFSZ 00,F
+001FA:  BRA    01F8
+....................    delay_us(50);                //Requires this delay to work properly 
+001FC:  MOVLW  53
+001FE:  MOVWF  00
+00200:  DECFSZ 00,F
+00202:  BRA    0200
+.................... } 
+00204:  RETLW  00
+....................  
+.................... void MCP23016_Reg_Write16(byte Reg, unsigned int16 Data) 
+.................... //Write data to registers in 16 bit mode 
+.................... { 
+....................    byte Data1, Data2;            //Data to write 
+....................     
+....................    Data1= (Data & 0x00FF); 
+*
+0044E:  MOVF   2A,W
+00450:  MOVWF  2C
+....................    Data2=((Data & 0xFF00) >> 8); 
+00452:  CLRF   2E
+00454:  MOVFF  2B,2D
+....................    i2c_start();                  //Starting Signal 
+00458:  BSF    F94.4
+0045A:  MOVLW  05
+0045C:  MOVWF  00
+0045E:  DECFSZ 00,F
+00460:  BRA    045E
+00462:  BSF    F94.3
+00464:  MOVLW  06
+00466:  MOVWF  00
+00468:  DECFSZ 00,F
+0046A:  BRA    0468
+0046C:  BCF    F8B.4
+0046E:  BCF    F94.4
+00470:  MOVLW  05
+00472:  MOVWF  00
+00474:  DECFSZ 00,F
+00476:  BRA    0474
+00478:  BCF    F8B.3
+0047A:  BCF    F94.3
+....................    i2c_write(MCP23016Address);   //I2C Address (Write) 
+0047C:  MOVLW  40
+0047E:  MOVWF  2E
+00480:  RCALL  013A
+....................    i2c_write(Reg);               //Select register 
+00482:  MOVFF  29,2E
+00486:  RCALL  013A
+....................    i2c_write(Data1);              //Write data 
+00488:  MOVFF  2C,2E
+0048C:  RCALL  013A
+....................    i2c_write(Data2);              //Write data 
+0048E:  MOVFF  2D,2E
+00492:  RCALL  013A
+....................    i2c_stop(); 
+00494:  BCF    F94.4
+00496:  NOP   
+00498:  BSF    F94.3
+0049A:  BTFSS  F82.3
+0049C:  BRA    049A
+0049E:  MOVLW  05
+004A0:  MOVWF  00
+004A2:  DECFSZ 00,F
+004A4:  BRA    04A2
+004A6:  BRA    04A8
+004A8:  NOP   
+004AA:  BSF    F94.4
+004AC:  MOVLW  05
+004AE:  MOVWF  00
+004B0:  DECFSZ 00,F
+004B2:  BRA    04B0
+....................    delay_us(50);                //Requires this delay to work properly 
+004B4:  MOVLW  53
+004B6:  MOVWF  00
+004B8:  DECFSZ 00,F
+004BA:  BRA    04B8
+.................... } 
+004BC:  RETLW  00
+....................  
+....................  
+.................... byte PCF8574_Reg_Read(byte Reg) 
+.................... //Read data from the register in 8 bit mode 
+.................... { 
+....................    byte Data;            //Data read 
+....................     
+....................    i2c_start();                  //Starting Signal 
+....................    i2c_write(MCP23016Address);    //I2C Address (Write) 
+....................    i2c_write(Reg);               //Select register 
+....................    i2c_stop(); 
+....................    delay_us(50);                //Requires this delay to work properly 
+....................    i2c_start();                  //Starting Signal 
+....................    i2c_write(MCP23016Address|1);  //I2C Address (Read) 
+....................    Data = i2c_read(0);           //Read value with NAK 
+....................    return (Data); 
+.................... } 
+....................  
+.................... int16 PCF8574_Reg_Read16(byte Reg) 
+.................... //Read data from a couple of registers 
+.................... { 
+....................    byte Data1, Data2;            //Data read 
+....................    unsigned int16 Data;          //the 16bit value of both registers 
+....................     
+....................    i2c_start();                  //Starting Signal 
+*
+00374:  BSF    F94.4
+00376:  MOVLW  05
+00378:  MOVWF  00
+0037A:  DECFSZ 00,F
+0037C:  BRA    037A
+0037E:  BSF    F94.3
+00380:  MOVLW  06
+00382:  MOVWF  00
+00384:  DECFSZ 00,F
+00386:  BRA    0384
+00388:  BTFSS  F82.3
+0038A:  BRA    0388
+0038C:  BCF    F8B.4
+0038E:  BCF    F94.4
+00390:  MOVLW  05
+00392:  MOVWF  00
+00394:  DECFSZ 00,F
+00396:  BRA    0394
+00398:  BCF    F8B.3
+0039A:  BCF    F94.3
+....................    i2c_write(MCP23016Address);    //I2C Address (Write) 
+0039C:  MOVLW  40
+0039E:  MOVWF  2E
+003A0:  RCALL  013A
+....................    i2c_write(Reg);               //Select register 
+003A2:  MOVFF  25,2E
+003A6:  RCALL  013A
+....................    i2c_stop(); 
+003A8:  BCF    F94.4
+003AA:  NOP   
+003AC:  BSF    F94.3
+003AE:  BTFSS  F82.3
+003B0:  BRA    03AE
+003B2:  MOVLW  05
+003B4:  MOVWF  00
+003B6:  DECFSZ 00,F
+003B8:  BRA    03B6
+003BA:  BRA    03BC
+003BC:  NOP   
+003BE:  BSF    F94.4
+003C0:  MOVLW  05
+003C2:  MOVWF  00
+003C4:  DECFSZ 00,F
+003C6:  BRA    03C4
+....................    delay_us(50);                //Requires this delay to work properly 
+003C8:  MOVLW  53
+003CA:  MOVWF  00
+003CC:  DECFSZ 00,F
+003CE:  BRA    03CC
+....................    i2c_start();                  //Starting Signal 
+003D0:  BSF    F94.4
+003D2:  MOVLW  05
+003D4:  MOVWF  00
+003D6:  DECFSZ 00,F
+003D8:  BRA    03D6
+003DA:  BSF    F94.3
+003DC:  MOVLW  06
+003DE:  MOVWF  00
+003E0:  DECFSZ 00,F
+003E2:  BRA    03E0
+003E4:  BCF    F8B.4
+003E6:  BCF    F94.4
+003E8:  MOVLW  05
+003EA:  MOVWF  00
+003EC:  DECFSZ 00,F
+003EE:  BRA    03EC
+003F0:  BCF    F8B.3
+003F2:  BCF    F94.3
+....................    i2c_write(MCP23016Address|1);  //I2C Address (Read) 
+003F4:  MOVLW  41
+003F6:  MOVWF  2E
+003F8:  RCALL  013A
+....................    Data1 = i2c_read();           //Read first value 
+003FA:  MOVLW  01
+003FC:  MOVWF  00
+003FE:  RCALL  0206
+00400:  MOVFF  01,26
+....................    Data2 = i2c_read(0);          //Read second value with NAK 
+00404:  CLRF   00
+00406:  RCALL  0206
+00408:  MOVFF  01,27
+....................    i2c_stop(); 
+0040C:  BCF    F94.4
+0040E:  NOP   
+00410:  BSF    F94.3
+00412:  BTFSS  F82.3
+00414:  BRA    0412
+00416:  MOVLW  05
+00418:  MOVWF  00
+0041A:  DECFSZ 00,F
+0041C:  BRA    041A
+0041E:  BRA    0420
+00420:  NOP   
+00422:  BSF    F94.4
+00424:  MOVLW  05
+00426:  MOVWF  00
+00428:  DECFSZ 00,F
+0042A:  BRA    0428
+....................    delay_us(50);                //Requires this delay to work properly 
+0042C:  MOVLW  53
+0042E:  MOVWF  00
+00430:  DECFSZ 00,F
+00432:  BRA    0430
+....................    Data=Data2; 
+00434:  CLRF   29
+00436:  MOVFF  27,28
+....................    Data=Data<<8; 
+0043A:  MOVFF  28,29
+0043E:  CLRF   28
+....................    Data=Data|Data1; 
+00440:  MOVF   26,W
+00442:  IORWF  28,F
+....................    return (Data); 
+00444:  MOVFF  28,01
+00448:  MOVFF  29,02
+.................... } 
+0044C:  RETLW  00
+....................  
+.................... void MCP23016_output_high (int16 Pin) 
+.................... //Set a pin or set of pins at PortA and PortB 
+.................... { 
+....................    MCP23016_Reg_Write16(GP0, PCF8574_Reg_Read16(GP0)|Pin); 
+*
+004BE:  CLRF   25
+004C0:  RCALL  0374
+004C2:  MOVFF  02,26
+004C6:  MOVF   01,W
+004C8:  MOVWF  25
+004CA:  IORWF  23,W
+004CC:  MOVWF  27
+004CE:  MOVF   02,W
+004D0:  IORWF  24,W
+004D2:  MOVWF  28
+004D4:  CLRF   29
+004D6:  MOVWF  2B
+004D8:  MOVFF  27,2A
+004DC:  RCALL  044E
+.................... } 
+004DE:  RETLW  00
+....................  
+.................... void MCP23016_output_low (unsigned int16 Pin) 
+.................... //clear a pin or set of pins at PortA and PortB 
+.................... { 
+....................    MCP23016_Reg_Write16(GP0, PCF8574_Reg_Read16(GP0)& ~Pin); 
+004E0:  CLRF   25
+004E2:  RCALL  0374
+004E4:  MOVFF  02,26
+004E8:  MOVFF  01,25
+004EC:  MOVFF  24,03
+004F0:  COMF   03,F
+004F2:  MOVF   23,W
+004F4:  XORLW  FF
+004F6:  ANDWF  01,W
+004F8:  MOVWF  27
+004FA:  MOVF   03,W
+004FC:  ANDWF  02,W
+004FE:  MOVWF  28
+00500:  CLRF   29
+00502:  MOVWF  2B
+00504:  MOVFF  27,2A
+00508:  RCALL  044E
+.................... } 
+0050A:  RETLW  00
+....................  
+.................... int1 MCP23016_input(int16 Pin) 
+.................... //Get the value of a pin at PortA and PortB. If more than one pin is requested 
+.................... //the function return true if any of the pins is active 
+.................... { 
+....................    int16  data; 
+....................    data=PCF8574_Reg_Read16(GP0) & Pin; 
+....................    if (data>0) return (true); 
+....................    return (false); 
+.................... } 
+....................  
+.................... #include "SRF02.h"            //SRF02 Device (Sonar via I2C) 
+.................... /* 
+.................... Library:       SRF02.h 
+.................... Purpose:       Manage one or more SRF02 I2C Ultrasonic Sensor 
+.................... Developer:     Quark Robotics 
+.................... Date:          July 2011 
+....................  
+.................... FUNCTIONS: 
+....................  
+.................... -SRF02_Distance_16(byte SRF02Address) returns the distance in cm to the 
+.................... obstacle in the selected SRF02 device in int16 format 
+.................... -SRF02_Distance_8(byte SRF02Address) returns the distance in cm to the 
+.................... obstacle in the selected SRF02 device in byte format 
+....................  
+.................... */ 
+....................  
+....................  
+.................... int16 SRF02_Distance_16(byte DeviceAddress)        
+.................... //Read the Distance in cm and return it in int16 format 
+.................... { 
+....................    byte DataHigh=0, DataLow=0;         //Bytes read 
+....................    int16 Distance;                      //Value measured in cm 
+....................     
+....................    i2c_start(); 
+....................    i2c_write(DeviceAddress); 
+....................    i2c_write(0x00);                    // Register for commands 
+....................    i2c_write(0x51);                    // Start measure un cm 
+....................    i2c_stop(); 
+....................    delay_ms(70);                       // Time for SRF02 to calculate distance 
+....................    i2c_start(); 
+....................    i2c_write(DeviceAddress); 
+....................    i2c_write(0x02);                    // Register to start reading 
+....................    i2c_start(); 
+....................    i2c_write(DeviceAddress|1); 
+....................    DataHigh = i2c_read();              // with ACK 
+....................    DataLow = i2c_read(0);              // with NAK 
+....................    i2c_stop(); 
+....................    Distance = (DataHigh<<8);           // Calculate the range 
+....................    Distance += DataLow; 
+....................    return (Distance); 
+.................... } 
+....................  
+.................... byte SRF02_Distance_8(byte DeviceAddress)       // 
+.................... //Return the Distance in cm as a byte (máx 255cm) 
+.................... { 
+....................    byte DataHigh=0, DataLow=0;         //Bytes read 
+*
+0026C:  CLRF   22
+0026E:  CLRF   23
+....................    byte Distance;                      //Value measured in cm 
+....................     
+....................    i2c_start(); 
+00270:  BSF    F94.4
+00272:  MOVLW  05
+00274:  MOVWF  00
+00276:  DECFSZ 00,F
+00278:  BRA    0276
+0027A:  BSF    F94.3
+0027C:  MOVLW  06
+0027E:  MOVWF  00
+00280:  DECFSZ 00,F
+00282:  BRA    0280
+00284:  BCF    F8B.4
+00286:  BCF    F94.4
+00288:  MOVLW  05
+0028A:  MOVWF  00
+0028C:  DECFSZ 00,F
+0028E:  BRA    028C
+00290:  BCF    F8B.3
+00292:  BCF    F94.3
+....................    i2c_write(DeviceAddress); 
+00294:  MOVFF  21,2E
+00298:  RCALL  013A
+....................    i2c_write(0x00);                    // Register for commands 
+0029A:  CLRF   2E
+0029C:  RCALL  013A
+....................    i2c_write(0x51);                    // Start measure un cm 
+0029E:  MOVLW  51
+002A0:  MOVWF  2E
+002A2:  RCALL  013A
+....................    i2c_stop(); 
+002A4:  BCF    F94.4
+002A6:  NOP   
+002A8:  BSF    F94.3
+002AA:  BTFSS  F82.3
+002AC:  BRA    02AA
+002AE:  MOVLW  05
+002B0:  MOVWF  00
+002B2:  DECFSZ 00,F
+002B4:  BRA    02B2
+002B6:  BRA    02B8
+002B8:  NOP   
+002BA:  BSF    F94.4
+002BC:  MOVLW  05
+002BE:  MOVWF  00
+002C0:  DECFSZ 00,F
+002C2:  BRA    02C0
+....................    delay_ms(70);                       // Time for SRF02 to calculate distance 
+002C4:  MOVLW  46
+002C6:  MOVWF  25
+002C8:  RCALL  00EE
+....................    i2c_start(); 
+002CA:  BSF    F94.4
+002CC:  MOVLW  05
+002CE:  MOVWF  00
+002D0:  DECFSZ 00,F
+002D2:  BRA    02D0
+002D4:  BSF    F94.3
+002D6:  MOVLW  06
+002D8:  MOVWF  00
+002DA:  DECFSZ 00,F
+002DC:  BRA    02DA
+002DE:  BCF    F8B.4
+002E0:  BCF    F94.4
+002E2:  MOVLW  05
+002E4:  MOVWF  00
+002E6:  DECFSZ 00,F
+002E8:  BRA    02E6
+002EA:  BCF    F8B.3
+002EC:  BCF    F94.3
+....................    i2c_write(DeviceAddress); 
+002EE:  MOVFF  21,2E
+002F2:  RCALL  013A
+....................    i2c_write(0x02);                    // Register to start reading 
+002F4:  MOVLW  02
+002F6:  MOVWF  2E
+002F8:  RCALL  013A
+....................    i2c_start(); 
+002FA:  BSF    F94.4
+002FC:  MOVLW  05
+002FE:  MOVWF  00
+00300:  DECFSZ 00,F
+00302:  BRA    0300
+00304:  BSF    F94.3
+00306:  MOVLW  06
+00308:  MOVWF  00
+0030A:  DECFSZ 00,F
+0030C:  BRA    030A
+0030E:  BTFSS  F82.3
+00310:  BRA    030E
+00312:  BCF    F8B.4
+00314:  BCF    F94.4
+00316:  MOVLW  05
+00318:  MOVWF  00
+0031A:  DECFSZ 00,F
+0031C:  BRA    031A
+0031E:  BCF    F8B.3
+00320:  BCF    F94.3
+....................    i2c_write(DeviceAddress|1); 
+00322:  MOVF   21,W
+00324:  IORLW  01
+00326:  MOVWF  25
+00328:  MOVWF  2E
+0032A:  RCALL  013A
+....................    DataHigh = i2c_read();              // with ACK 
+0032C:  MOVLW  01
+0032E:  MOVWF  00
+00330:  RCALL  0206
+00332:  MOVFF  01,22
+....................    DataLow = i2c_read(0);              // with NAK 
+00336:  CLRF   00
+00338:  RCALL  0206
+0033A:  MOVFF  01,23
+....................    i2c_stop(); 
+0033E:  BCF    F94.4
+00340:  NOP   
+00342:  BSF    F94.3
+00344:  BTFSS  F82.3
+00346:  BRA    0344
+00348:  MOVLW  05
+0034A:  MOVWF  00
+0034C:  DECFSZ 00,F
+0034E:  BRA    034C
+00350:  BRA    0352
+00352:  NOP   
+00354:  BSF    F94.4
+00356:  MOVLW  05
+00358:  MOVWF  00
+0035A:  DECFSZ 00,F
+0035C:  BRA    035A
+....................    if (DataHigh>0) Distance=255; 
+0035E:  MOVF   22,F
+00360:  BZ    0368
+00362:  MOVLW  FF
+00364:  MOVWF  24
+....................    else Distance=DataLow; 
+00366:  BRA    036C
+00368:  MOVFF  23,24
+....................    return (Distance); 
+0036C:  MOVFF  24,01
+.................... } 
+00370:  GOTO   08AE (RETURN)
+....................  
+....................  
+....................  
+.................... //I2C address 
+.................... #DEFINE  LM75Address      0x9E  //Temperature sensor 
+.................... #DEFINE  SRF02Address     0xE0  //Sonar sensor 
+....................  
+.................... //Pins assignment 
+.................... #DEFINE  ZX81_WAIT       PIN_A1   //Active low. stop ZX81 clock during a transfer 
+.................... #DEFINE  ZX81_DIR        PIN_A2   //Data dir. 1:ZX81->ExpCard, 0:ExpCard->ZX81 
+.................... #DEFINE  Relay           PIN_A3   //Relay control 
+.................... #DEFINE  PIR             PIN_A5   //PIR signal 
+.................... #DEFINE  ZX81_READY      PIN_B0   //Indicate ZX81 is ready for a read or write 
+.................... #DEFINE  DataLine0       PIN_C5   //Data line 0 
+.................... #DEFINE  LED             PIN_C6   //Test led 
+....................  
+.................... //Motors control 
+.................... #DEFINE  FORWARD         255      //Forward for motors 
+.................... #DEFINE  BACKWARD          0      //Backward for motors 
+.................... #DEFINE  STOP            128      //Stop for motors 
+.................... #DEFINE  ACTIVATE          0      //ACTIVATE for motors 
+.................... #DEFINE  OPEN            255      //OPEN for motors 
+.................... #DEFINE  CLOSE             0      //CLOSE for motors 
+.................... #DEFINE  UP              255      //Move up for motors 
+.................... #DEFINE  DOWN              0      //Move down for motors 
+....................  
+.................... #DEFINE  MaxDuty 800     //Maximum value of Duty Cycle (100%) 
+.................... #DEFINE  MinDuty 200     //Duty were the motor stops for sure 
+....................  
+.................... //Motor assignment 
+.................... #DEFINE  Maraca            1      //Motor assigned to Maraca 
+.................... #DEFINE  Hand_R            2      //Motor assigned to Hand of right arm 
+.................... #DEFINE  Arm_R             3      //Motor assigned to right arm 
+.................... #DEFINE  Light_R           4      //Motor assigned to light of right arm 
+.................... #DEFINE  Wheel_R           5      //Motor assigned to right wheel 
+.................... #DEFINE  Wheel_L           6      //Motor assigned to left wheel 
+.................... #DEFINE  Shoulder_R        7      //Motor assigned to shoulder of right arm 
+.................... #DEFINE  Shoulder_L        8      //Motor assigned to shoulder of left arm 
+....................  
+....................  
+.................... //Counters 
+.................... #DEFINE  MaxCounters    2     //Number of multipurpose counters 
+.................... #DEFINE  AutoNavFwd     0     //counter for allowing forward movement 
+.................... #DEFINE  Dance          1     //counter for dance times 
+....................  
+.................... #DEFINE  MaxAutoNavFwd   381     //x13.1= 5s aprox 
+.................... #DEFINE  MaxDance        763     //x13.1= 10s aprox 
+....................  
+....................  
+.................... byte  Temperature=0;             //Temperature of the card 
+.................... byte  Distance=0;                //Value in cm of distance to obstacle 8bit 
+.................... int1  PIRStatus=FALSE;           //Status of PIR sensor 
+....................  
+.................... int1  AutoNavMode=FALSE;      //Indicate if auto navigation mode is active 
+.................... int16 Counter[MaxCounters];         //Multipurpose counters incremented by interrupt 
+....................  
+.................... int16  i;                            //Used for local FOR loops 
+....................  
+....................  
+....................  
+.................... #INT_TIMER3 
+.................... //Timer3 Interrupt. Used for several multipurpose counters Counter[] 
+.................... //overflows every 13.1ms incrementing all counters by 1 
+.................... void Timer3_isr()  
+.................... { 
+....................    byte NumCounter; 
+....................  
+....................    for(NumCounter=0;NumCounter<MaxCounters;NumCounter++) 
+*
+0009E:  CLRF   30
+000A0:  MOVF   30,W
+000A2:  SUBLW  01
+000A4:  BNC   00C2
+....................       Counter[NumCounter]++; 
+000A6:  BCF    FD8.0
+000A8:  RLCF   30,W
+000AA:  CLRF   03
+000AC:  ADDLW  1B
+000AE:  MOVWF  FE9
+000B0:  MOVLW  00
+000B2:  ADDWFC 03,W
+000B4:  MOVWF  FEA
+000B6:  MOVLW  01
+000B8:  ADDWF  FEE,F
+000BA:  BNC   00BE
+000BC:  INCF   FEF,F
+000BE:  INCF   30,F
+000C0:  BRA    00A0
+.................... } 
+....................  
+....................  
+000C2:  BCF    FA1.1
+000C4:  GOTO   0058
+.................... void InitGeneralPurposeCounters()  
+.................... //Put all general purpose counters to 0 
+.................... { 
+....................    byte NumCounter; 
+....................  
+....................    for(NumCounter=0;NumCounter<MaxCounters;NumCounter++) 
+000C8:  CLRF   21
+000CA:  MOVF   21,W
+000CC:  SUBLW  01
+000CE:  BNC   00EA
+....................       Counter[NumCounter]=0; 
+000D0:  BCF    FD8.0
+000D2:  RLCF   21,W
+000D4:  CLRF   03
+000D6:  ADDLW  1B
+000D8:  MOVWF  FE9
+000DA:  MOVLW  00
+000DC:  ADDWFC 03,W
+000DE:  MOVWF  FEA
+000E0:  CLRF   FEC
+000E2:  MOVF   FED,F
+000E4:  CLRF   FEF
+000E6:  INCF   21,F
+000E8:  BRA    00CA
+.................... }    
+000EA:  GOTO   088A (RETURN)
+....................  
+.................... void Blink (byte blinks) 
+.................... //Blinks card led 
+.................... { 
+....................    byte i; 
+....................    for(i=1;i<=blinks;i++) { 
+*
+00114:  MOVLW  01
+00116:  MOVWF  22
+00118:  MOVF   22,W
+0011A:  SUBWF  21,W
+0011C:  BNC   0136
+....................       output_high(LED); 
+0011E:  BCF    F94.6
+00120:  BSF    F8B.6
+....................       delay_ms(100); 
+00122:  MOVLW  64
+00124:  MOVWF  25
+00126:  RCALL  00EE
+....................       output_low(LED); 
+00128:  BCF    F94.6
+0012A:  BCF    F8B.6
+....................       delay_ms(100);               
+0012C:  MOVLW  64
+0012E:  MOVWF  25
+00130:  RCALL  00EE
+....................    } 
+00132:  INCF   22,F
+00134:  BRA    0118
+.................... } 
+00136:  GOTO   0896 (RETURN)
+....................  
+....................  
+.................... void SetMotor (byte MotorNum, Direction) 
+.................... //Control the direction of the 8 motors 
+.................... //Direction 128:Stop, >128:Forward, <128:backwards 
+.................... { 
+....................    switch (MotorNum) { 
+*
+0050C:  MOVF   21,W
+0050E:  XORLW  01
+00510:  BZ    053A
+00512:  XORLW  03
+00514:  BZ    0576
+00516:  XORLW  01
+00518:  BZ    05B2
+0051A:  XORLW  07
+0051C:  BTFSC  FD8.2
+0051E:  BRA    05EE
+00520:  XORLW  01
+00522:  BTFSC  FD8.2
+00524:  BRA    062A
+00526:  XORLW  03
+00528:  BTFSC  FD8.2
+0052A:  BRA    0666
+0052C:  XORLW  01
+0052E:  BTFSC  FD8.2
+00530:  BRA    06A2
+00532:  XORLW  0F
+00534:  BTFSC  FD8.2
+00536:  BRA    06DE
+00538:  BRA    071A
+....................       case 1: 
+....................          if(Direction<128){ 
+0053A:  MOVF   22,W
+0053C:  SUBLW  7F
+0053E:  BNC   0550
+....................             MCP23016_output_high (MCP23016_PIN_A0); 
+00540:  CLRF   24
+00542:  MOVLW  01
+00544:  MOVWF  23
+00546:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_A1); 
+00548:  CLRF   24
+0054A:  MOVLW  02
+0054C:  MOVWF  23
+0054E:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+00550:  MOVF   22,W
+00552:  SUBLW  80
+00554:  BC    0566
+....................             MCP23016_output_low  (MCP23016_PIN_A0); 
+00556:  CLRF   24
+00558:  MOVLW  01
+0055A:  MOVWF  23
+0055C:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_A1); 
+0055E:  CLRF   24
+00560:  MOVLW  02
+00562:  MOVWF  23
+00564:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+00566:  MOVF   22,W
+00568:  SUBLW  80
+0056A:  BNZ   0574
+....................             MCP23016_output_low (MCP23016_PIN_A0|MCP23016_PIN_A1);          
+0056C:  CLRF   24
+0056E:  MOVLW  03
+00570:  MOVWF  23
+00572:  RCALL  04E0
+....................          } 
+....................          break; 
+00574:  BRA    071C
+....................       case 2: 
+....................          if(Direction<128){ 
+00576:  MOVF   22,W
+00578:  SUBLW  7F
+0057A:  BNC   058C
+....................             MCP23016_output_high (MCP23016_PIN_A2); 
+0057C:  CLRF   24
+0057E:  MOVLW  04
+00580:  MOVWF  23
+00582:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_A3); 
+00584:  CLRF   24
+00586:  MOVLW  08
+00588:  MOVWF  23
+0058A:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+0058C:  MOVF   22,W
+0058E:  SUBLW  80
+00590:  BC    05A2
+....................             MCP23016_output_low  (MCP23016_PIN_A2); 
+00592:  CLRF   24
+00594:  MOVLW  04
+00596:  MOVWF  23
+00598:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_A3); 
+0059A:  CLRF   24
+0059C:  MOVLW  08
+0059E:  MOVWF  23
+005A0:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+005A2:  MOVF   22,W
+005A4:  SUBLW  80
+005A6:  BNZ   05B0
+....................             MCP23016_output_low (MCP23016_PIN_A2|MCP23016_PIN_A3);          
+005A8:  CLRF   24
+005AA:  MOVLW  0C
+005AC:  MOVWF  23
+005AE:  RCALL  04E0
+....................          } 
+....................          break; 
+005B0:  BRA    071C
+....................       case 3: 
+....................          if(Direction<128){ 
+005B2:  MOVF   22,W
+005B4:  SUBLW  7F
+005B6:  BNC   05C8
+....................             MCP23016_output_high (MCP23016_PIN_A4); 
+005B8:  CLRF   24
+005BA:  MOVLW  10
+005BC:  MOVWF  23
+005BE:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_A5); 
+005C0:  CLRF   24
+005C2:  MOVLW  20
+005C4:  MOVWF  23
+005C6:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+005C8:  MOVF   22,W
+005CA:  SUBLW  80
+005CC:  BC    05DE
+....................             MCP23016_output_low  (MCP23016_PIN_A4); 
+005CE:  CLRF   24
+005D0:  MOVLW  10
+005D2:  MOVWF  23
+005D4:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_A5); 
+005D6:  CLRF   24
+005D8:  MOVLW  20
+005DA:  MOVWF  23
+005DC:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+005DE:  MOVF   22,W
+005E0:  SUBLW  80
+005E2:  BNZ   05EC
+....................             MCP23016_output_low (MCP23016_PIN_A4|MCP23016_PIN_A5);          
+005E4:  CLRF   24
+005E6:  MOVLW  30
+005E8:  MOVWF  23
+005EA:  RCALL  04E0
+....................          } 
+....................          break; 
+005EC:  BRA    071C
+....................       case 4: 
+....................          if(Direction<128){ 
+005EE:  MOVF   22,W
+005F0:  SUBLW  7F
+005F2:  BNC   0604
+....................             MCP23016_output_high (MCP23016_PIN_A6); 
+005F4:  CLRF   24
+005F6:  MOVLW  40
+005F8:  MOVWF  23
+005FA:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_A7); 
+005FC:  CLRF   24
+005FE:  MOVLW  80
+00600:  MOVWF  23
+00602:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+00604:  MOVF   22,W
+00606:  SUBLW  80
+00608:  BC    061A
+....................             MCP23016_output_low  (MCP23016_PIN_A6); 
+0060A:  CLRF   24
+0060C:  MOVLW  40
+0060E:  MOVWF  23
+00610:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_A7); 
+00612:  CLRF   24
+00614:  MOVLW  80
+00616:  MOVWF  23
+00618:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+0061A:  MOVF   22,W
+0061C:  SUBLW  80
+0061E:  BNZ   0628
+....................             MCP23016_output_low (MCP23016_PIN_A6|MCP23016_PIN_A7);          
+00620:  CLRF   24
+00622:  MOVLW  C0
+00624:  MOVWF  23
+00626:  RCALL  04E0
+....................          } 
+....................          break; 
+00628:  BRA    071C
+....................       case 5: 
+....................          if(Direction<128){ 
+0062A:  MOVF   22,W
+0062C:  SUBLW  7F
+0062E:  BNC   0640
+....................             MCP23016_output_high (MCP23016_PIN_B0); 
+00630:  MOVLW  01
+00632:  MOVWF  24
+00634:  CLRF   23
+00636:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_B1); 
+00638:  MOVLW  02
+0063A:  MOVWF  24
+0063C:  CLRF   23
+0063E:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+00640:  MOVF   22,W
+00642:  SUBLW  80
+00644:  BC    0656
+....................             MCP23016_output_low  (MCP23016_PIN_B0); 
+00646:  MOVLW  01
+00648:  MOVWF  24
+0064A:  CLRF   23
+0064C:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_B1); 
+0064E:  MOVLW  02
+00650:  MOVWF  24
+00652:  CLRF   23
+00654:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+00656:  MOVF   22,W
+00658:  SUBLW  80
+0065A:  BNZ   0664
+....................             MCP23016_output_low (MCP23016_PIN_B0|MCP23016_PIN_B1);          
+0065C:  MOVLW  03
+0065E:  MOVWF  24
+00660:  CLRF   23
+00662:  RCALL  04E0
+....................          } 
+....................          break; 
+00664:  BRA    071C
+....................       case 6: 
+....................          if(Direction<128){ 
+00666:  MOVF   22,W
+00668:  SUBLW  7F
+0066A:  BNC   067C
+....................             MCP23016_output_high (MCP23016_PIN_B2); 
+0066C:  MOVLW  04
+0066E:  MOVWF  24
+00670:  CLRF   23
+00672:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_B3); 
+00674:  MOVLW  08
+00676:  MOVWF  24
+00678:  CLRF   23
+0067A:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+0067C:  MOVF   22,W
+0067E:  SUBLW  80
+00680:  BC    0692
+....................             MCP23016_output_low  (MCP23016_PIN_B2); 
+00682:  MOVLW  04
+00684:  MOVWF  24
+00686:  CLRF   23
+00688:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_B3); 
+0068A:  MOVLW  08
+0068C:  MOVWF  24
+0068E:  CLRF   23
+00690:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+00692:  MOVF   22,W
+00694:  SUBLW  80
+00696:  BNZ   06A0
+....................             MCP23016_output_low (MCP23016_PIN_B2|MCP23016_PIN_B3);          
+00698:  MOVLW  0C
+0069A:  MOVWF  24
+0069C:  CLRF   23
+0069E:  RCALL  04E0
+....................          } 
+....................          break; 
+006A0:  BRA    071C
+....................       case 7: 
+....................          if(Direction<128){ 
+006A2:  MOVF   22,W
+006A4:  SUBLW  7F
+006A6:  BNC   06B8
+....................             MCP23016_output_high (MCP23016_PIN_B4); 
+006A8:  MOVLW  10
+006AA:  MOVWF  24
+006AC:  CLRF   23
+006AE:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_B5); 
+006B0:  MOVLW  20
+006B2:  MOVWF  24
+006B4:  CLRF   23
+006B6:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+006B8:  MOVF   22,W
+006BA:  SUBLW  80
+006BC:  BC    06CE
+....................             MCP23016_output_low  (MCP23016_PIN_B4); 
+006BE:  MOVLW  10
+006C0:  MOVWF  24
+006C2:  CLRF   23
+006C4:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_B5); 
+006C6:  MOVLW  20
+006C8:  MOVWF  24
+006CA:  CLRF   23
+006CC:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+006CE:  MOVF   22,W
+006D0:  SUBLW  80
+006D2:  BNZ   06DC
+....................             MCP23016_output_low (MCP23016_PIN_B4|MCP23016_PIN_B5);          
+006D4:  MOVLW  30
+006D6:  MOVWF  24
+006D8:  CLRF   23
+006DA:  RCALL  04E0
+....................          } 
+....................          break; 
+006DC:  BRA    071C
+....................       case 8: 
+....................          if(Direction<128){ 
+006DE:  MOVF   22,W
+006E0:  SUBLW  7F
+006E2:  BNC   06F4
+....................             MCP23016_output_high (MCP23016_PIN_B6); 
+006E4:  MOVLW  40
+006E6:  MOVWF  24
+006E8:  CLRF   23
+006EA:  RCALL  04BE
+....................             MCP23016_output_low  (MCP23016_PIN_B7); 
+006EC:  MOVLW  80
+006EE:  MOVWF  24
+006F0:  CLRF   23
+006F2:  RCALL  04E0
+....................          } 
+....................          if(Direction>128){ 
+006F4:  MOVF   22,W
+006F6:  SUBLW  80
+006F8:  BC    070A
+....................             MCP23016_output_low  (MCP23016_PIN_B6); 
+006FA:  MOVLW  40
+006FC:  MOVWF  24
+006FE:  CLRF   23
+00700:  RCALL  04E0
+....................             MCP23016_output_high (MCP23016_PIN_B7); 
+00702:  MOVLW  80
+00704:  MOVWF  24
+00706:  CLRF   23
+00708:  RCALL  04BE
+....................          } 
+....................          if(Direction==128){ 
+0070A:  MOVF   22,W
+0070C:  SUBLW  80
+0070E:  BNZ   0718
+....................             MCP23016_output_low (MCP23016_PIN_B6|MCP23016_PIN_B7);          
+00710:  MOVLW  C0
+00712:  MOVWF  24
+00714:  CLRF   23
+00716:  RCALL  04E0
+....................          } 
+....................          break; 
+00718:  BRA    071C
+....................       default: 
+....................          break;  
+0071A:  BRA    071C
+....................    } 
+.................... } 
+0071C:  RETLW  00
+....................  
+.................... void Dancer () 
+.................... // Activate audio cassette and dance with maraca 
+.................... { 
+....................  
+....................    Output_high(RELAY);            //Relay (Casete) signal on  
+0071E:  BCF    F92.3
+00720:  BSF    F89.3
+....................    SetMotor (Maraca, ACTIVATE);    //Activate maraca 
+00722:  MOVLW  01
+00724:  MOVWF  21
+00726:  CLRF   22
+00728:  RCALL  050C
+....................    for (i=1;i<=8;++i) { 
+0072A:  CLRF   20
+0072C:  MOVLW  01
+0072E:  MOVWF  1F
+00730:  MOVF   20,F
+00732:  BNZ   07B8
+00734:  MOVF   1F,W
+00736:  SUBLW  08
+00738:  BNC   07B8
+....................       SetMotor (Wheel_R, FORWARD);    
+0073A:  MOVLW  05
+0073C:  MOVWF  21
+0073E:  MOVLW  FF
+00740:  MOVWF  22
+00742:  RCALL  050C
+....................       SetMotor (Wheel_L, BACKWARD);    
+00744:  MOVLW  06
+00746:  MOVWF  21
+00748:  CLRF   22
+0074A:  RCALL  050C
+....................       delay_ms (1000);  //Time of turn. Then stop 
+0074C:  MOVLW  04
+0074E:  MOVWF  21
+00750:  MOVLW  FA
+00752:  MOVWF  25
+00754:  RCALL  00EE
+00756:  DECFSZ 21,F
+00758:  BRA    0750
+....................       SetMotor (Wheel_R, STOP);    
+0075A:  MOVLW  05
+0075C:  MOVWF  21
+0075E:  MOVLW  80
+00760:  MOVWF  22
+00762:  RCALL  050C
+....................       SetMotor (Wheel_L, STOP);    
+00764:  MOVLW  06
+00766:  MOVWF  21
+00768:  MOVLW  80
+0076A:  MOVWF  22
+0076C:  RCALL  050C
+....................       delay_ms (1000);  //Time of turn. Then stop 
+0076E:  MOVLW  04
+00770:  MOVWF  21
+00772:  MOVLW  FA
+00774:  MOVWF  25
+00776:  RCALL  00EE
+00778:  DECFSZ 21,F
+0077A:  BRA    0772
+....................       SetMotor (Wheel_R, BACKWARD);    
+0077C:  MOVLW  05
+0077E:  MOVWF  21
+00780:  CLRF   22
+00782:  RCALL  050C
+....................       SetMotor (Wheel_L, FORWARD);    
+00784:  MOVLW  06
+00786:  MOVWF  21
+00788:  MOVLW  FF
+0078A:  MOVWF  22
+0078C:  RCALL  050C
+....................       delay_ms (1000);  //Time of turn. Then stop 
+0078E:  MOVLW  04
+00790:  MOVWF  21
+00792:  MOVLW  FA
+00794:  MOVWF  25
+00796:  RCALL  00EE
+00798:  DECFSZ 21,F
+0079A:  BRA    0792
+....................       SetMotor (Wheel_R, STOP);    
+0079C:  MOVLW  05
+0079E:  MOVWF  21
+007A0:  MOVLW  80
+007A2:  MOVWF  22
+007A4:  RCALL  050C
+....................       SetMotor (Wheel_L, STOP);    
+007A6:  MOVLW  06
+007A8:  MOVWF  21
+007AA:  MOVLW  80
+007AC:  MOVWF  22
+007AE:  RCALL  050C
+....................    } 
+007B0:  INCF   1F,F
+007B2:  BTFSC  FD8.2
+007B4:  INCF   20,F
+007B6:  BRA    0730
+....................    Output_low(RELAY);            //Relay (Casete) signal off  
+007B8:  BCF    F92.3
+007BA:  BCF    F89.3
+....................    SetMotor (Maraca, STOP);    //Activate maraca 
+007BC:  MOVLW  01
+007BE:  MOVWF  21
+007C0:  MOVLW  80
+007C2:  MOVWF  22
+007C4:  RCALL  050C
+....................    //Arm 
+....................    SetMotor (Arm_R, FORWARD);    //Extend Arm_R 
+007C6:  MOVLW  03
+007C8:  MOVWF  21
+007CA:  MOVLW  FF
+007CC:  MOVWF  22
+007CE:  RCALL  050C
+....................    delay_ms(1000); 
+007D0:  MOVLW  04
+007D2:  MOVWF  21
+007D4:  MOVLW  FA
+007D6:  MOVWF  25
+007D8:  RCALL  00EE
+007DA:  DECFSZ 21,F
+007DC:  BRA    07D4
+....................    SetMotor (Arm_R, STOP);    //Stop Arm_R 
+007DE:  MOVLW  03
+007E0:  MOVWF  21
+007E2:  MOVLW  80
+007E4:  MOVWF  22
+007E6:  RCALL  050C
+....................    delay_ms(1000); 
+007E8:  MOVLW  04
+007EA:  MOVWF  21
+007EC:  MOVLW  FA
+007EE:  MOVWF  25
+007F0:  RCALL  00EE
+007F2:  DECFSZ 21,F
+007F4:  BRA    07EC
+....................    SetMotor (Arm_R, BACKWARD);    //Compress Arm_R 
+007F6:  MOVLW  03
+007F8:  MOVWF  21
+007FA:  CLRF   22
+007FC:  RCALL  050C
+....................    delay_ms(1000); 
+007FE:  MOVLW  04
+00800:  MOVWF  21
+00802:  MOVLW  FA
+00804:  MOVWF  25
+00806:  RCALL  00EE
+00808:  DECFSZ 21,F
+0080A:  BRA    0802
+....................    SetMotor (Arm_R, STOP);    //Stop Arm_R 
+0080C:  MOVLW  03
+0080E:  MOVWF  21
+00810:  MOVLW  80
+00812:  MOVWF  22
+00814:  RCALL  050C
+.................... } 
+00816:  GOTO   08C4 (RETURN)
+....................  
+....................  
+....................  
+.................... /////////////////////////////////////////////////////////////////////////////// 
+.................... //////                                                                   ////// 
+.................... //////                          MAIN BODY                                ////// 
+.................... //////                                                                   ////// 
+.................... /////////////////////////////////////////////////////////////////////////////// 
+....................  
+.................... void main() 
+.................... { 
+0081A:  CLRF   FF8
+0081C:  BCF    FD0.7
+0081E:  BSF    0D.7
+00820:  CLRF   FEA
+00822:  CLRF   FE9
+00824:  MOVF   FC1,W
+00826:  ANDLW  C0
+00828:  IORLW  0F
+0082A:  MOVWF  FC1
+0082C:  MOVLW  07
+0082E:  MOVWF  FB4
+00830:  CLRF   18
+00832:  CLRF   19
+00834:  BCF    1A.0
+00836:  BCF    1A.1
+....................  
+....................    //Ports configuration 
+....................    set_tris_a (0b11110101);        //configure port A (See comments at header) 
+00838:  MOVLW  F5
+0083A:  MOVWF  F92
+....................    set_tris_b (0b11111111);        //configure port B (See comments at header) 
+0083C:  MOVLW  FF
+0083E:  MOVWF  F93
+....................    set_tris_c (0b10100001);        //configure port C (See comments at header) 
+00840:  MOVLW  A1
+00842:  MOVWF  F94
+....................     
+....................    Output_low(RELAY);            //Relay signal off  
+00844:  BCF    F92.3
+00846:  BCF    F89.3
+....................    Output_low(LED);              //Led off 
+00848:  BCF    F94.6
+0084A:  BCF    F8B.6
+....................    Output_high(ZX81_WAIT);       //Non wait (Active low) 
+0084C:  BCF    F92.1
+0084E:  BSF    F89.1
+....................  
+....................  
+....................    //TIMERS CONFIGURATION 
+....................    setup_timer_3(T3_INTERNAL|T3_DIV_BY_1);   //Timer for multipurpose counters 
+00850:  MOVF   FB1,W
+00852:  ANDLW  48
+00854:  IORLW  85
+00856:  MOVWF  FB1
+....................    set_timer3(0);                            //ensure overflow every 13.1ms 
+00858:  CLRF   FB3
+0085A:  CLRF   FB2
+....................  
+....................    //PWM generation 
+....................    setup_timer_2(T2_DIV_BY_1,199,1);          // PWM 1 & 2 aprox 25KHz 
+0085C:  MOVLW  00
+0085E:  IORLW  04
+00860:  MOVWF  FCA
+00862:  MOVLW  C7
+00864:  MOVWF  FCB
+....................    setup_ccp1(CCP_PWM);                       
+00866:  BCF    F94.2
+00868:  BCF    F8B.2
+0086A:  MOVLW  0C
+0086C:  MOVWF  FBD
+....................    setup_ccp2(CCP_PWM); 
+0086E:  BCF    F94.1
+00870:  BCF    F8B.1
+00872:  MOVWF  FBA
+....................    set_pwm1_duty(800);          
+00874:  MOVLW  C8
+00876:  MOVWF  FBE
+00878:  MOVF   FBD,W
+0087A:  ANDLW  CF
+0087C:  MOVWF  FBD
+....................    set_pwm2_duty(500);          
+0087E:  MOVLW  7D
+00880:  MOVWF  FBB
+00882:  MOVF   FBA,W
+00884:  ANDLW  CF
+00886:  MOVWF  FBA
+....................  
+....................    //General Purpose counters 
+....................    InitGeneralPurposeCounters(); 
+00888:  BRA    00C8
+....................  
+....................    //ENABLE INTERRUPTS 
+....................    enable_interrupts(INT_TIMER3);   //Timer3 overflow 
+0088A:  BSF    FA0.1
+....................    enable_interrupts(GLOBAL);    
+0088C:  MOVLW  C0
+0088E:  IORWF  FF2,F
+....................  
+....................  
+....................    //OTHER INITIAL SETUPS -------------------------------- 
+....................  
+....................    Blink(10); 
+00890:  MOVLW  0A
+00892:  MOVWF  21
+00894:  BRA    0114
+....................  
+....................    //I/O Espander port config . Do not move. 
+....................    MCP23016_Reg_Write(IODIR0, 0b00000000); 
+00896:  MOVLW  06
+00898:  MOVWF  21
+0089A:  CLRF   22
+0089C:  RCALL  01A6
+....................    MCP23016_Reg_Write(IODIR1, 0b00000000); 
+0089E:  MOVLW  07
+008A0:  MOVWF  21
+008A2:  CLRF   22
+008A4:  RCALL  01A6
+....................     
+....................  
+.................... //   set_pwm1_duty(800);           //Duty cycle of Group 1 of motors  
+....................  
+.................... AutoNavMode=TRUE; 
+008A6:  BSF    1A.1
+.................... //Output_high(RELAY); 
+....................  
+....................    while (TRUE) { //MAIN LOOP 
+....................  
+.................... //      Temperature=LM75_TempRead(LM75Address);   //Get temperature 
+.................... //      PIRStatus=Input(PIR);                     //Get PIR status 
+....................       Distance=SRF02_Distance_8(SRF02Address);         //Get Sonar range 
+008A8:  MOVLW  E0
+008AA:  MOVWF  21
+008AC:  BRA    026C
+008AE:  MOVFF  01,19
+....................  
+.................... /*delay_ms(1000); 
+....................  
+.................... If (Distance!=0) Blink(2); 
+.................... */ 
+.................... //If (PIRStatus) Blink(2); 
+....................  
+....................    //Arm 
+.................... /*   SetMotor (Shoulder_L, UP);    //Move up Shoulder_L 
+....................    delay_ms(6000); 
+....................    SetMotor (Shoulder_L, STOP);    //Stop Shoulder_L 
+....................    delay_ms(1000); 
+....................    SetMotor (Shoulder_L, DOWN);    //Move down Shoulder_L 
+....................    delay_ms(3000); 
+....................    SetMotor (Shoulder_L, STOP);    //Stop Shoulder_L 
+....................    delay_ms(2000); 
+....................  
+.................... */ 
+....................  
+....................  
+.................... /* 
+....................  
+....................             SetMotor (Wheel_R, FORWARD);    
+....................             SetMotor (Wheel_L, FORWARD);    
+....................             delay_ms (1000);  //Time of turn. Then stop 
+....................             SetMotor (Wheel_R, STOP);    
+....................             SetMotor (Wheel_L, STOP);    
+....................  
+....................  
+....................    //Arm 
+....................    SetMotor (Arm_R, FORWARD);    //Extend Arm_R 
+....................    delay_ms(1000); 
+....................    SetMotor (Arm_R, STOP);    //Stop Arm_R 
+....................    delay_ms(1000); 
+....................    SetMotor (Arm_R, BACKWARD);    //Compress Arm_R 
+....................    delay_ms(1000); 
+....................    SetMotor (Arm_R, STOP);    //Stop Arm_R 
+....................    delay_ms(1000); 
+....................  
+....................    //Hand 
+....................    SetMotor (Hand_R, OPEN);    //Open hand 
+....................    delay_ms(1000); 
+....................    SetMotor (Hand_R, STOP);    //Stop hand 
+....................    delay_ms(1000); 
+....................    SetMotor (Light_R, ACTIVATE);    //Activate Light right arm 
+....................    delay_ms(1000); 
+....................    SetMotor (Light_R, STOP);    //STOP Light right arm 
+....................    SetMotor (Hand_R, CLOSE);    //Close hand 
+....................    delay_ms(1000); 
+....................    SetMotor (Hand_R, STOP);    //Stop hand 
+....................    delay_ms(1000); 
+....................  
+....................    //Maraca 
+....................    SetMotor (Maraca, ACTIVATE);    //Activate maraca 
+....................    delay_ms(2000); 
+....................    SetMotor (Maraca, STOP);    //Stop maraca 
+....................    delay_ms(4000); 
+.................... */ 
+....................       //Activación audio 
+.................... /*      SetRelay(TRUE); 
+....................       delay_ms(2000); 
+....................       SetRelay(FALSE); 
+....................       delay_ms(4000); 
+.................... */      
+....................  
+.................... //Counter[Dance]=0; 
+....................  
+....................       if (Counter[Dance]>MaxDance){ 
+008B2:  MOVF   1E,W
+008B4:  SUBLW  01
+008B6:  BC    08C8
+008B8:  XORLW  FF
+008BA:  BNZ   08C2
+008BC:  MOVF   1D,W
+008BE:  SUBLW  FB
+008C0:  BC    08C8
+....................          Dancer (); 
+008C2:  BRA    071E
+....................          Counter[Dance]=0; 
+008C4:  CLRF   1E
+008C6:  CLRF   1D
+....................       } 
+....................  
+....................       if(AutoNavMode) { 
+008C8:  BTFSS  1A.1
+008CA:  BRA    0952
+....................          if(((Distance<50)&&(Distance>0))||(Counter[AutoNavFwd]>MaxAutoNavFwd)) {  
+008CC:  MOVF   19,W
+008CE:  SUBLW  31
+008D0:  BNC   08D6
+008D2:  MOVF   19,F
+008D4:  BNZ   08E6
+008D6:  MOVF   1C,W
+008D8:  SUBLW  00
+008DA:  BC    093E
+008DC:  XORLW  FF
+008DE:  BNZ   08E6
+008E0:  MOVF   1B,W
+008E2:  SUBLW  7D
+008E4:  BC    093E
+....................          //Obstacle in front or too much time going ahead. Turn a bit 
+....................             SetMotor (Wheel_R, STOP);    
+008E6:  MOVLW  05
+008E8:  MOVWF  21
+008EA:  MOVLW  80
+008EC:  MOVWF  22
+008EE:  RCALL  050C
+....................             SetMotor (Wheel_L, STOP);    
+008F0:  MOVLW  06
+008F2:  MOVWF  21
+008F4:  MOVLW  80
+008F6:  MOVWF  22
+008F8:  RCALL  050C
+....................             delay_ms (100); 
+008FA:  MOVLW  64
+008FC:  MOVWF  25
+008FE:  CALL   00EE
+....................             SetMotor (Wheel_R, FORWARD);    
+00902:  MOVLW  05
+00904:  MOVWF  21
+00906:  MOVLW  FF
+00908:  MOVWF  22
+0090A:  RCALL  050C
+....................             SetMotor (Wheel_L, BACKWARD);    
+0090C:  MOVLW  06
+0090E:  MOVWF  21
+00910:  CLRF   22
+00912:  RCALL  050C
+....................             delay_ms (1000);  //Time of turn. Then stop 
+00914:  MOVLW  04
+00916:  MOVWF  21
+00918:  MOVLW  FA
+0091A:  MOVWF  25
+0091C:  CALL   00EE
+00920:  DECFSZ 21,F
+00922:  BRA    0918
+....................             SetMotor (Wheel_R, STOP);    
+00924:  MOVLW  05
+00926:  MOVWF  21
+00928:  MOVLW  80
+0092A:  MOVWF  22
+0092C:  RCALL  050C
+....................             SetMotor (Wheel_L, STOP);    
+0092E:  MOVLW  06
+00930:  MOVWF  21
+00932:  MOVLW  80
+00934:  MOVWF  22
+00936:  RCALL  050C
+....................             Counter[AutoNavFwd]=0; 
+00938:  CLRF   1C
+0093A:  CLRF   1B
+....................          } 
+....................          else {                             //No obstacle. Go forward 
+0093C:  BRA    0952
+....................             SetMotor (Wheel_R, FORWARD);    
+0093E:  MOVLW  05
+00940:  MOVWF  21
+00942:  MOVLW  FF
+00944:  MOVWF  22
+00946:  RCALL  050C
+....................             SetMotor (Wheel_L, FORWARD);    
+00948:  MOVLW  06
+0094A:  MOVWF  21
+0094C:  MOVLW  FF
+0094E:  MOVWF  22
+00950:  RCALL  050C
+....................          } 
+....................       } 
+....................  
+....................    } //End While MAIN LOOP 
+00952:  BRA    08A8
+....................  
+.................... }  //End Program 
+00954:  SLEEP 
+
+Configuration Fuses:
+   Word  1: C200   HS IESO FCMEN
+   Word  2: 0E1E   BROWNOUT WDT128 NOWDT BORV21 PUT
+   Word  3: 8700   CCP2C1 PBADEN LPT1OSC MCLR
+   Word  4: 0081   STVREN NODEBUG NOLVP NOXINST RESERVED
+   Word  5: C00F   NOPROTECT NOCPD NOCPB
+   Word  6: E00F   NOWRT NOWRTD NOWRTC NOWRTB
+   Word  7: 400F   NOEBTR NOEBTRB

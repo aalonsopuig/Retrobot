@@ -1,0 +1,70 @@
+[PROJECT]
+Target=RetroBot.hex
+Development_Mode=
+Processor_Text=PIC18F2620
+ToolSuite=CCS
+Processor=0x2620
+[Consola]
+Type=4
+Path=
+FileList=
+BuildTool=
+OptionString=
+AdditionalOptionString=
+[mru-list]
+1=RetroBot.c
+[Windows]
+0=0000 %S 0 0 796 451 3 0
+[Opened Files]
+1=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\RetroBot.c
+2=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\RetroBot.h
+3=C:\Archivos de programa\PICC\devices\18F2620.h
+4=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\LM75.h
+5=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\MCP23016.h
+6=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\SRF02.h
+7=
+8=C:\DOCUME~1\ALEJAN~1\CONFIG~1\Temp\Rar$DR06.750\srf08.h
+9=
+10=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\MAX7456.h
+11=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\MCP23016.h
+12=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\KeyPad4x4.h
+13=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\ADG715.h
+14=C:\Documents and Settings\Alejandro\Mis documentos\My Dropbox\Robotics\Varios\ZX81\RetroBot\RetroBotPRG\DVR.h
+15=
+[Directories]
+Include=C:\Program Files\PICC\devices\;C:\Program Files\PICC\drivers\;
+Library=
+LinkerScript=
+[defines]
+enabled=0
+D1=
+V1=
+[fileformats]
+forcecoff=0
+debug=4
+error=2
+object=0
+list=0
+scratch=0
+sta=1
+tre=1
+allerrors=1
+allwarnings=1
+stayupne=3
+stayupoe=0
+[Target Data]
+BuildTool=C-COMPILER
+OptionString=+FH
+AdditionalOptionString=
+BuildRequired=1
+FileList=RetroBot.c
+[RetroBot.c]
+Type=4
+Path=
+FileList=
+BuildTool=
+OptionString=
+AdditionalOptionString=
+[Units]
+Count=1
+1=RetroBot.c (main)
